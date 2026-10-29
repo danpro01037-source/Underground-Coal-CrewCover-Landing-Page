@@ -64,7 +64,6 @@ export default function Footer() {
           <ul className="mt-2 text-sm sm:mt-4 sm:space-y-2.5">
             <li><button onClick={() => setLegal('privacy')} className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Privacy Policy</button></li>
             <li><button onClick={() => setLegal('terms')} className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Terms of Use</button></li>
-            <li><a href="/admin/leads" className="cc-link inline-block py-2 text-white/40 hover:text-cc-yellow sm:py-0">Leads Admin</a></li>
           </ul>
         </div>
       </div>
