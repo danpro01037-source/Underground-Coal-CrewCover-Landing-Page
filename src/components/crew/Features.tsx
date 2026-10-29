@@ -1,4 +1,4 @@
-import { BellRing, Zap, IdCard, MessageSquare, Building2, BarChart3, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { BellRing, Zap, MessageSquare, BarChart3, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { REPORT_BARS, IMAGES } from '@/data/crewcover';
 import { SectionHeading } from './primitives';
 import TiltCard from './TiltCard';
@@ -92,7 +92,7 @@ export default function Features() {
             </div>
           </TiltCard>
 
-          <TiltCard delay={150}>
+          <TiltCard className="md:col-span-2" delay={150}>
             <div className="p-7">
               <IconBadge Icon={Zap} />
               <h3 className="font-display mt-5 text-3xl">Urgent <span className="text-cc-yellow">Boost</span></h3>
@@ -101,19 +101,7 @@ export default function Features() {
             </div>
           </TiltCard>
 
-          <TiltCard delay={200}>
-            <div className="p-7">
-              <IconBadge Icon={IdCard} />
-              <h3 className="font-display mt-5 text-3xl">Licences &amp; <span className="text-cc-yellow">tickets</span></h3>
-              <p className="mt-2 text-white/60">Every ticket on file with expiry dates and status flags.</p>
-              <div className="mt-4 space-y-1.5 text-xs">
-                <div className="flex items-center justify-between"><span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-green-400" />Standard 11</span><span className="text-green-400">Current</span></div>
-                <div className="flex items-center justify-between"><span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-cc-yellow" />Medical</span><span className="text-cc-yellow">Exp. 14 Dec</span></div>
-              </div>
-            </div>
-          </TiltCard>
-
-          <TiltCard className="md:col-span-2" delay={100}>
+          <TiltCard className="md:col-span-2 lg:col-span-4" delay={100}>
             <div className="flex h-full flex-col gap-6 p-7 sm:flex-row sm:items-center">
               <div className="flex-1">
                 <IconBadge Icon={MessageSquare} />
@@ -126,24 +114,6 @@ export default function Features() {
                   <div className="rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2">Still good for the Deputy shift tonight?</div>
                 </div>
                 <div className="ml-auto w-fit rounded-2xl rounded-br-sm bg-cc-yellow px-3 py-2 font-semibold text-black">All good. See you at 5:30 <CheckCircle2 className="ml-1 inline h-3 w-3" /></div>
-              </div>
-            </div>
-          </TiltCard>
-
-          <TiltCard className="md:col-span-2" delay={150}>
-            <div className="flex h-full flex-col gap-6 p-7 sm:flex-row sm:items-center">
-              <div className="flex-1">
-                <IconBadge Icon={Building2} />
-                <h3 className="font-display mt-5 text-3xl">Multi-site <span className="text-cc-yellow">management</span></h3>
-                <p className="mt-2 text-white/60">Run every site under one organisation, each with its own approved worker pool.</p>
-              </div>
-              <div className="grid w-full max-w-[230px] grid-cols-2 gap-2 text-xs">
-                {['Hunter Valley', 'Bowen Basin', 'Illawarra', 'Surat Basin'].map((s, i) => (
-                  <div key={s} className={`rounded-xl border p-2.5 ${i === 0 ? 'border-cc-yellow/50 bg-cc-yellow/10' : 'border-white/10 bg-black/40'}`}>
-                    <div className="font-semibold">{s}</div>
-                    <div className="text-white/50">{[42, 31, 18, 24][i]} workers</div>
-                  </div>
-                ))}
               </div>
             </div>
           </TiltCard>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Send, Loader2, Mail, CalendarDays, MapPin, ShieldCheck } from 'lucide-react';
-import { CRM_SUBSCRIBE_URL, SITE_OPTIONS, SUPPORT_EMAIL, BOOKING_URL, PLANS } from '@/data/crewcover';
+import { CRM_SUBSCRIBE_URL, CONTACT_EMAIL_ENDPOINT, SITE_OPTIONS, SUPPORT_EMAIL, BOOKING_URL, PLANS, SHOW_PRICING } from '@/data/crewcover';
 import { supabase } from '@/lib/supabase';
 import { SectionHeading, Reveal } from './primitives';
 import MagneticButton from './MagneticButton';
@@ -61,8 +61,29 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
       sms_opt_in: sms === true,
     };
 
-    // Save to database and CRM in parallel
-    const [dbResult, crmResult] = await Promise.allSettled([
+    // Email the support inbox, and save to database and CRM, in parallel
+    const [emailResult, dbResult, crmResult] = await Promise.allSettled([
+      fetch(CONTACT_EMAIL_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `New CrewCover enquiry from ${lead.name} (${lead.company})`,
+          _template: 'table',
+          _replyto: lead.email,
+          Name: lead.name,
+          Company: lead.company,
+          Email: lead.email,
+          Phone: lead.phone || 'Not provided',
+          'Number of sites': lead.sites || 'Not specified',
+          ...(SHOW_PRICING ? { 'Plan of interest': lead.plan || 'Not sure yet' } : {}),
+          'SMS updates': lead.sms_opt_in ? 'Yes' : 'No',
+          Message: lead.message,
+        }),
+      }).then(async (res) => {
+        const body = await res.json().catch(() => null);
+        // FormSubmit answers 200 with success "false" until the inbox owner activates the form
+        if (!res.ok || String(body?.success) !== 'true') throw new Error(body?.message || 'Email request failed');
+      }),
       supabase.from('contact_leads').insert(lead).then(({ error }) => {
         if (error) throw error;
       }),
@@ -89,10 +110,11 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
       }),
     ]);
 
+    if (emailResult.status === 'rejected') console.error('Email to support failed', emailResult.reason);
     if (dbResult.status === 'rejected') console.error('Lead save failed', dbResult.reason);
     if (crmResult.status === 'rejected') console.error('CRM subscribe failed', crmResult.reason);
 
-    if (dbResult.status === 'fulfilled' || crmResult.status === 'fulfilled') {
+    if (emailResult.status === 'fulfilled' || dbResult.status === 'fulfilled' || crmResult.status === 'fulfilled') {
       setStatus('success');
       setForm(EMPTY);
     } else {
@@ -148,20 +170,22 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
                 <input id="cc-phone" type="tel" value={form.phone} onChange={set('phone')} className={field('phone')} placeholder="0400 000 000" autoComplete="tel" />
                 {errors.phone && <p className="mt-1.5 text-xs text-red-400">{errors.phone}</p>}
               </div>
-              <div>
+              <div className={SHOW_PRICING ? '' : 'sm:col-span-2'}>
                 <label htmlFor="cc-sites" className={label}>Number of sites</label>
                 <select id="cc-sites" value={form.sites} onChange={set('sites')} className={`${field('sites')} appearance-none`}>
                   <option value="" className="bg-cc-black">Select number of sites</option>
                   {SITE_OPTIONS.map((o) => <option key={o} value={o} className="bg-cc-black">{o}</option>)}
                 </select>
               </div>
-              <div>
-                <label htmlFor="cc-plan" className={label}>Plan of interest</label>
-                <select id="cc-plan" value={form.plan} onChange={set('plan')} className={`${field('plan')} appearance-none`}>
-                  <option value="" className="bg-cc-black">Not sure yet</option>
-                  {PLANS.map((p) => <option key={p.id} value={p.name} className="bg-cc-black">{p.name}</option>)}
-                </select>
-              </div>
+              {SHOW_PRICING && (
+                <div>
+                  <label htmlFor="cc-plan" className={label}>Plan of interest</label>
+                  <select id="cc-plan" value={form.plan} onChange={set('plan')} className={`${field('plan')} appearance-none`}>
+                    <option value="" className="bg-cc-black">Not sure yet</option>
+                    {PLANS.map((p) => <option key={p.id} value={p.name} className="bg-cc-black">{p.name}</option>)}
+                  </select>
+                </div>
+              )}
               <div className="sm:col-span-2">
                 <label htmlFor="cc-message" className={label}>Message</label>
                 <textarea id="cc-message" rows={4} value={form.message} onChange={set('message')} className={`${field('message')} resize-none`} placeholder="Tell us about your crew size, roles and rosters..." />

@@ -18,6 +18,10 @@ export const CRM_SUBSCRIBE_URL = 'https://famous.ai/api/crm/6ae2e84ffc5940719ee6
 export const APP_STORE_URL = 'https://apps.apple.com/';
 export const PLAY_STORE_URL = 'https://play.google.com/store';
 export const SUPPORT_EMAIL = 'support@crewcover.com.au';
+// FormSubmit relays contact form submissions to SUPPORT_EMAIL (needs a one-time activation from that inbox)
+export const CONTACT_EMAIL_ENDPOINT = `https://formsubmit.co/ajax/${SUPPORT_EMAIL}`;
+// Pricing is hidden during the pilot phase; flip to true to show the section, nav link and plan picker again
+export const SHOW_PRICING = false;
 export const TAGLINE_A = 'Shift happens.';
 export const TAGLINE_B = "We've got you covered.";
 
@@ -27,7 +31,7 @@ export const NAV_LINKS = [
   { id: 'pricing', label: 'Pricing' },
   { id: 'faqs', label: 'FAQs' },
   { id: 'contact', label: 'Contact' },
-];
+].filter((l) => SHOW_PRICING || l.id !== 'pricing');
 
 export const HERO_NOTIFICATIONS = [
   { title: 'New shift: Deputy', body: 'Night shift · Hunter Valley, NSW · 6:00pm', tone: 'info' },
@@ -35,7 +39,7 @@ export const HERO_NOTIFICATIONS = [
   { title: 'Shift confirmed', body: 'Longwall Operator · Tue 28 Oct · Day shift', tone: 'success' },
 ] as const;
 
-export const TICKER_WORDS = ['POST A SHIFT', 'ALERT YOUR CREW', 'GET COVERED', 'SHIFT HAPPENS'];
+export const TICKER_WORDS = ['POST A SHIFT', 'GET COVERED', 'SHIFT HAPPENS'];
 
 export const OLD_WAY = [
   { title: 'Endless phone calls', desc: 'Ringing down the list at 4am hoping someone picks up.' },
@@ -117,12 +121,54 @@ export const PLANS: Plan[] = [
   },
 ];
 
-export const FAQS = [
-  { q: 'Is it free for workers?', a: 'Yes. CrewCover is completely free for underground coal mining workers. Download the app, build your profile, add your tickets and start receiving shift alerts at no cost.' },
-  { q: 'Who can see our shifts?', a: "Only workers who have linked to your mine site and been approved by your supervisor can see your shifts. Your shifts are never publicly listed, and personal mobile numbers stay private through CrewCover's secure messaging." },
-  { q: 'How do workers join our site?', a: 'Workers sign up in the app and request to link to your mine site. Your supervisor reviews their profile, tickets and medicals, then approves them with one tap. From then on, they receive your shift alerts.' },
-  { q: 'Can we manage more than one site?', a: 'Absolutely. Crew Pro and Crew Enterprise support multiple sites under one organisation, with separate worker pools, supervisors and permissions for each site, plus consolidated reporting.' },
-  { q: 'Is our data secure?', a: 'Yes. All data is encrypted in transit and at rest, hosted in Australia, and access is role-based. Workers and employers communicate through secure in-app messaging, so personal phone numbers are never exposed.' },
+export type FaqGroup = { id: string; label: string; items: { q: string; a: string }[] };
+
+export const FAQ_GROUPS: FaqGroup[] = [
+  {
+    id: 'workers',
+    label: 'Workers',
+    items: [
+      { q: 'Is it free for workers?', a: 'Yes. CrewCover is completely free for underground coal mining workers. Download the app, build your profile, add your tickets and start receiving shift alerts at no cost.' },
+      { q: 'Do workers have to join?', a: 'No, it is not compulsory for workers to sign up to CrewCover. However if they do not, they will not receive notifications of any shift vacancies.' },
+      { q: 'What is CrewCover?', a: 'CrewCover is an Australian workforce platform designed for the underground coal mining industry. It connects suitably qualified workers with mining contractors and employers who need to fill vacant shifts quickly.' },
+      { q: 'Do I need to leave my current job to use CrewCover?', a: 'No. CrewCover is designed to help workers find additional shift opportunities around their existing commitments, subject to their employment contract, fatigue management requirements and site rules.' },
+      { q: 'How do workers find available shifts?', a: 'Once registered, workers can browse advertised shifts, filter opportunities by work area and role, and view relevant shift details before expressing interest.' },
+      { q: 'Can workers choose when they’re available to work?', a: 'Yes. CrewCover is designed to let workers manage their availability so employers can identify suitable workers for vacant shifts.' },
+      { q: 'Can workers choose not to receive notifications about shifts?', a: 'Yes, workers have the ability to turn off notifications within the app.' },
+      { q: 'What underground mining roles are available?', a: 'CrewCover is designed for numerous roles including Underground Fitters, Underground Electricians, Shearer Operators, Continuous Miner Drivers, Control Room Operators and Deputies, across Longwall, Development, Outbye process areas. Additional roles can be added as required by each mine site.' },
+      { q: 'Can I work shifts at different mine sites?', a: "Potentially, yes. Workers (such as Contract workers) must meet the relevant mine site's induction, competency, authorisation, medical and other entry requirements before commencing work." },
+      { q: "How will I know if I've been selected for a shift?", a: 'CrewCover is planned to provide shift updates and messaging within the app. The exact notification and confirmation process should be finalised before launch.' },
+      { q: 'Who pays me for the shifts I work?', a: 'The employer or contracting company engaging you would be responsible for payment under the applicable employment agreement. CrewCover merely provides the platform for the employer to advertise the vacancy and the ability for the worker to accept the vacancy.' },
+      { q: 'How do I get started?', a: 'Register your interest, create your worker profile, add your qualifications and competencies, and set your availability. Once the platform launches, you can explore suitable shift opportunities.' },
+    ],
+  },
+  {
+    id: 'employers',
+    label: 'Employers & Supervisors',
+    items: [
+      { q: 'Who can see our shifts?', a: "Only workers who have linked to your mine site and been approved by your supervisor can see your shifts. Your shifts are never publicly listed, and personal mobile numbers stay private through CrewCover's secure messaging." },
+      { q: 'How do workers join our site?', a: 'Workers sign up in the app and request to link to your mine site. The authorised site person reviews their profile, tickets and medicals, then approves them with one tap. From then on, they receive shift alerts.' },
+      { q: 'How does CrewCover help us fill vacant shifts?', a: 'CrewCover allows employers and authorised supervisors to advertise vacant shifts, identify available workers and manage responses from one central platform. Instead of relying on multiple phone calls and messages, you can coordinate shift coverage in just a few clicks.' },
+      { q: 'How quickly can we find a replacement worker?', a: 'CrewCover is designed to speed up the process of finding suitable available workers. Actual filling times depend on worker availability, required competencies, site eligibility and employer approval but generally, can be undertaken in a number of minutes.' },
+      { q: 'Can we find workers for specific underground mining roles?', a: 'Yes. CrewCover is designed to support roles including Underground Fitters, Underground Electricians, Shearer Operators, Continuous Miner Drivers, Control Room Operators and Deputies, across Longwall, Development, Outbye and Surface operations. Other roles can be added as required by an authorised person of the organisation.' },
+      { q: 'Can we advertise multiple vacant shifts at once?', a: 'CrewCover is intended to make it easy to manage multiple shift vacancies from one dashboard, reducing the administrative burden on supervisors and workforce coordinators.' },
+      { q: 'Can we book workers for last-minute absences or emergency shift coverage?', a: 'CrewCover is designed for both planned workforce requirements and unexpected vacancies, including sick leave, unplanned absences and short-notice roster gaps. All bookings remain subject to worker availability and site requirements.' },
+      { q: 'How do we know workers have the right qualifications?', a: 'CrewCover is designed to help employers review relevant worker profiles, qualifications and competencies. Employers remain responsible for verifying that each worker meets the requirements of the position and mine site.' },
+      { q: 'Can we see whether a worker is inducted at our mine site?', a: 'Site induction and eligibility information could form part of the worker profile, subject to verification and appropriate permissions. This feature should be confirmed before launch.' },
+      { q: 'Does CrewCover manage fatigue compliance?', a: "CrewCover supports workforce planning without replacing an employer's fatigue management systems. Employers and workers remain responsible for complying with applicable fatigue, fitness-for-work and site safety requirements." },
+      { q: 'Who is responsible for safety, supervision and site compliance?', a: 'The relevant mine operator, employer and other duty holders retain their legal responsibilities under applicable work health and safety and mining legislation. CrewCover does not replace site-specific safety and authorisation processes.' },
+      { q: 'Can supervisors manage their crews through CrewCover?', a: 'CrewCover is designed to provide a central place for managing vacant shifts, reviewing worker availability, communicating with workers and tracking shift coverage.' },
+      { q: 'Can multiple supervisors or managers access the same company account?', a: "CrewCover's subscription model is intended to support business accounts. The final number of users and permission levels will depend on the selected subscription and platform configuration." },
+      { q: 'What real-time data and management reports will CrewCover provide?', a: 'CrewCover is planned to provide visibility into shift vacancies, coverage status, worker availability and workforce activity. Reporting could include shifts advertised, shifts filled, response times, unfilled vacancies and trends by site or work area.' },
+      { q: 'Can we manage multiple mine sites?', a: 'CrewCover is designed for mining contractors operating across different locations. Multi-site access and reporting should be defined within the relevant subscription package.' },
+      { q: 'Can CrewCover reduce time spent making phone calls and sending messages?', a: 'Yes. By centralising shift advertisements, worker responses and communications, CrewCover aims to reduce the manual coordination involved in finding staff to cover vacant shifts.' },
+      { q: 'How much does CrewCover cost for employers?', a: 'CrewCover offers casual shift advertising, monthly subscription options and annual subscription options allowing employers to choose a model that suits their workforce requirements.' },
+      { q: 'Do we have to commit to a monthly subscription?', a: "No. CrewCover's proposed Casual option allows employers to advertise individual shifts without committing to a monthly subscription. Additionally, Annual Packages are available at a cheaper overall rate than monthly subscriptions." },
+      { q: 'Who employs and pays workers booked through CrewCover?', a: 'CrewCover is designed as a workforce marketplace rather than the employer of every worker using the platform. Employment, payroll and contractual responsibilities must be clearly established between the relevant parties before a shift is confirmed.' },
+      { q: 'Can we use CrewCover with our existing employees?', a: 'Yes. CrewCover is intended to support workforce coordination and shift coverage by providing their own employees or approved worker pools the ability to work additional shifts.' },
+      { q: 'Is our company and workforce information kept confidential?', a: 'CrewCover uses appropriate account permissions and data security measures to protect company and worker information. CrewCover privacy policy explains what information is collected, stored and shared and how this information is treated.' },
+    ],
+  },
 ];
 
 export const SITE_OPTIONS = ['1 site', '2 to 3 sites', '4 to 10 sites', '10+ sites'];

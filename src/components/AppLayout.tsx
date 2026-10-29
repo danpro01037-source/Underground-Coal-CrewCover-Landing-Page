@@ -15,7 +15,7 @@ import FinalCTA from './crew/FinalCTA';
 import Contact from './crew/Contact';
 import Footer from './crew/Footer';
 import { LightDivider } from './crew/primitives';
-import type { Plan } from '@/data/crewcover';
+import { SHOW_PRICING, type Plan } from '@/data/crewcover';
 
 export default function AppLayout() {
   const [ready, setReady] = useState(false);
@@ -52,7 +52,7 @@ export default function AppLayout() {
         <LightDivider />
         <Features />
         <Stats />
-        <Pricing onSelectPlan={selectPlan} />
+        {SHOW_PRICING && <Pricing onSelectPlan={selectPlan} />}
         <LightDivider />
         <FAQ />
         <Ticker reverse tilt={2} />

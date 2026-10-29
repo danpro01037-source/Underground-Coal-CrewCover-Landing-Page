@@ -31,8 +31,8 @@ export default function Problem() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <SectionHeading
           eyebrow="The problem"
-          title={<>Short a crew? <span className="text-cc-yellow">Not anymore.</span></>}
-          sub="Filling a last-minute vacancy underground shouldn't mean 50 phone calls before dawn."
+          title={<>Short a few in the crew? <span className="text-cc-yellow">Not anymore.</span></>}
+          sub="Filling a last-minute vacancy shouldn't mean 25 phone calls looking for coverage."
         />
 
         <div ref={ref} className="relative mt-16 grid gap-6 lg:grid-cols-2">

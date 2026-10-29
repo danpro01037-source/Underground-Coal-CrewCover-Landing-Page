@@ -68,7 +68,7 @@ export default function Hero({ ready }: { ready: boolean }) {
           </h1>
 
           <p className={`mt-6 max-w-xl text-lg text-white/75 transition-all delay-700 duration-700 sm:text-xl ${ready ? 'opacity-100' : 'translate-y-6 opacity-0'}`}>
-            Post a shift, alert your crew instantly, and get it covered in minutes.
+            Post a shift, get it covered and be alerted instantly.
           </p>
 
           <div className={`mt-9 transition-all delay-[900ms] duration-700 ${ready ? 'opacity-100' : 'translate-y-6 opacity-0'}`}>
