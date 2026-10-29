@@ -12,14 +12,14 @@ export const IMAGES = {
   ],
 };
 
-export const BOOKING_URL =
-  'https://famous.ai/api/crm/6ae2e84ffc5940719ee6940c/calendar/public?calendarId=3d10b4f1-ee95-4b7d-b510-264ffc610329&view=booking';
-export const CRM_SUBSCRIBE_URL = 'https://famous.ai/api/crm/6ae2e84ffc5940719ee6940c/subscribe';
 export const APP_STORE_URL = 'https://apps.apple.com/';
 export const PLAY_STORE_URL = 'https://play.google.com/store';
 export const SUPPORT_EMAIL = 'support@crewcover.com.au';
-// FormSubmit relays contact form submissions to SUPPORT_EMAIL (needs a one-time activation from that inbox)
-export const CONTACT_EMAIL_ENDPOINT = `https://formsubmit.co/ajax/${SUPPORT_EMAIL}`;
+// Contact form emails go to SUPPORT_EMAIL. With a Web3Forms access key (free, from web3forms.com) they go via
+// Web3Forms; without one they go via FormSubmit, which needs a one-time activation click from that inbox.
+export const WEB3FORMS_ACCESS_KEY = '53747a69-00e9-4de7-8d20-7edfab669d25';
+export const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${SUPPORT_EMAIL}`;
+export const DEMO_REQUEST_MESSAGE = "Hi CrewCover team, I'd like to book a demo. A good time to reach me is: ";
 // Pricing is hidden during the pilot phase; flip to true to show the section, nav link and plan picker again
 export const SHOW_PRICING = false;
 export const TAGLINE_A = 'Shift happens.';

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, ArrowRight, HardHat } from 'lucide-react';
-import { PLANS, BOOKING_URL, type Plan } from '@/data/crewcover';
+import { PLANS, type Plan } from '@/data/crewcover';
+import { requestDemo } from './demo';
 import { SectionHeading } from './primitives';
 import MagneticButton from './MagneticButton';
 import { useInView } from '@/hooks/useCrewMotion';
@@ -54,7 +55,7 @@ function PlanCard({ plan, annual, onSelect, index }: { plan: Plan; annual: boole
       </ul>
       <div className="mt-8">
         {plan.id === 'enterprise' ? (
-          <MagneticButton href={BOOKING_URL} external variant="ghost" className="w-full">
+          <MagneticButton onClick={requestDemo} variant="ghost" className="w-full">
             {plan.cta} <ArrowRight className="h-4 w-4" />
           </MagneticButton>
         ) : (

@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 import { useLiteMode } from '@/hooks/useCrewMotion';
-import { APP_STORE_URL, PLAY_STORE_URL, BOOKING_URL } from '@/data/crewcover';
+import { APP_STORE_URL, PLAY_STORE_URL } from '@/data/crewcover';
 import { CalendarDays } from 'lucide-react';
+import { requestDemo } from './demo';
 
 type Props = {
   children: React.ReactNode;
@@ -87,7 +88,7 @@ export function StoreButtons({ demo = true, className = '' }: { demo?: boolean; 
         </span>
       </MagneticButton>
       {demo && (
-        <MagneticButton href={BOOKING_URL} external variant="ghost" className="py-[18px]" ariaLabel="Book a Demo">
+        <MagneticButton onClick={requestDemo} variant="ghost" className="py-[18px]" ariaLabel="Book a Demo">
           <CalendarDays className="h-5 w-5 text-cc-yellow" />
           Book a Demo
         </MagneticButton>

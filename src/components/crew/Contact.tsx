@@ -1,12 +1,57 @@
 import { useEffect, useState } from 'react';
 import { Send, Loader2, Mail, CalendarDays, MapPin, ShieldCheck } from 'lucide-react';
-import { CRM_SUBSCRIBE_URL, CONTACT_EMAIL_ENDPOINT, SITE_OPTIONS, SUPPORT_EMAIL, BOOKING_URL, PLANS, SHOW_PRICING } from '@/data/crewcover';
-import { supabase } from '@/lib/supabase';
+import { WEB3FORMS_ACCESS_KEY, FORMSUBMIT_ENDPOINT, DEMO_REQUEST_MESSAGE, SITE_OPTIONS, SUPPORT_EMAIL, PLANS, SHOW_PRICING } from '@/data/crewcover';
 import { SectionHeading, Reveal } from './primitives';
 import MagneticButton from './MagneticButton';
+import { DEMO_REQUEST_EVENT, requestDemo } from './demo';
 
 type Form = { name: string; company: string; email: string; phone: string; sites: string; plan: string; message: string };
 const EMPTY: Form = { name: '', company: '', email: '', phone: '', sites: '', plan: '', message: '' };
+
+/** The enquiry as it appears in the support inbox. */
+function enquiry(f: Form, sms: boolean) {
+  const name = f.name.trim().slice(0, 200);
+  const company = f.company.trim().slice(0, 200);
+  return {
+    subject: `New CrewCover enquiry from ${name} (${company})`,
+    replyTo: f.email.trim().slice(0, 320),
+    fields: {
+      Name: name,
+      Company: company,
+      Email: f.email.trim().slice(0, 320),
+      Phone: f.phone.trim().slice(0, 40) || 'Not provided',
+      'Number of sites': f.sites || 'Not specified',
+      ...(SHOW_PRICING ? { 'Plan of interest': f.plan || 'Not sure yet' } : {}),
+      'SMS updates': sms ? 'Yes' : 'No',
+      Message: f.message.trim().slice(0, 5000),
+    } as Record<string, string>,
+  };
+}
+
+/** Email the enquiry to SUPPORT_EMAIL via Web3Forms when a key is set, otherwise FormSubmit. Throws on failure. */
+async function sendEnquiryEmail({ subject, replyTo, fields }: ReturnType<typeof enquiry>) {
+  const web3forms = Boolean(WEB3FORMS_ACCESS_KEY);
+  const res = await fetch(web3forms ? 'https://api.web3forms.com/submit' : FORMSUBMIT_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    signal: AbortSignal.timeout(15000),
+    body: JSON.stringify(
+      web3forms
+        ? { access_key: WEB3FORMS_ACCESS_KEY, subject, from_name: 'CrewCover website', replyto: replyTo, ...fields }
+        : { _subject: subject, _template: 'table', _replyto: replyTo, ...fields }
+    ),
+  });
+  const body = await res.json().catch(() => null);
+  // FormSubmit answers 200 with success "false" until the inbox owner activates the form
+  if (!res.ok || String(body?.success) !== 'true') throw new Error(body?.message || `Email request failed (HTTP ${res.status})`);
+}
+
+/** Fallback when automatic sending fails: the visitor's own email app, prefilled with the enquiry. */
+function mailtoHref(f: Form, sms: boolean) {
+  const { subject, fields } = enquiry(f, sms);
+  const body = Object.entries(fields).map(([k, v]) => `${k}: ${v}`).join('\n');
+  return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 function SparkBurst() {
   return (
@@ -29,6 +74,15 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
     if (prefill || plan) setStatus('idle');
   }, [prefill, plan]);
 
+  useEffect(() => {
+    const onDemoRequest = () => {
+      setForm((f) => ({ ...f, message: f.message.trim() ? f.message : DEMO_REQUEST_MESSAGE }));
+      setStatus('idle');
+    };
+    window.addEventListener(DEMO_REQUEST_EVENT, onDemoRequest);
+    return () => window.removeEventListener(DEMO_REQUEST_EVENT, onDemoRequest);
+  }, []);
+
   const set = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
     if (errors[k]) setErrors((er) => ({ ...er, [k]: undefined }));
@@ -50,74 +104,13 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
     if (!validate() || status === 'loading') return;
     setStatus('loading');
 
-    const lead = {
-      name: form.name.trim().slice(0, 200),
-      company: form.company.trim().slice(0, 200),
-      email: form.email.trim().slice(0, 320),
-      phone: form.phone.trim() ? form.phone.trim().slice(0, 40) : null,
-      sites: form.sites || null,
-      plan: form.plan || null,
-      message: form.message.trim().slice(0, 5000),
-      sms_opt_in: sms === true,
-    };
-
-    // Email the support inbox, and save to database and CRM, in parallel
-    const [emailResult, dbResult, crmResult] = await Promise.allSettled([
-      fetch(CONTACT_EMAIL_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          _subject: `New CrewCover enquiry from ${lead.name} (${lead.company})`,
-          _template: 'table',
-          _replyto: lead.email,
-          Name: lead.name,
-          Company: lead.company,
-          Email: lead.email,
-          Phone: lead.phone || 'Not provided',
-          'Number of sites': lead.sites || 'Not specified',
-          ...(SHOW_PRICING ? { 'Plan of interest': lead.plan || 'Not sure yet' } : {}),
-          'SMS updates': lead.sms_opt_in ? 'Yes' : 'No',
-          Message: lead.message,
-        }),
-      }).then(async (res) => {
-        const body = await res.json().catch(() => null);
-        // FormSubmit answers 200 with success "false" until the inbox owner activates the form
-        if (!res.ok || String(body?.success) !== 'true') throw new Error(body?.message || 'Email request failed');
-      }),
-      supabase.from('contact_leads').insert(lead).then(({ error }) => {
-        if (error) throw error;
-      }),
-      fetch(CRM_SUBSCRIBE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: lead.email,
-          name: lead.name || undefined,
-          phone: lead.phone || undefined,
-          sms_opt_in: sms === true,
-          source: 'contact-form',
-          tags: [
-            'contact-form',
-            'employer-lead',
-            lead.sites ? `sites-${lead.sites}` : 'sites-unknown',
-            ...(lead.plan ? [`plan-${lead.plan.toLowerCase().replace(/\s+/g, '-')}`] : []),
-          ],
-          company: lead.company,
-          message: lead.message,
-        }),
-      }).then((res) => {
-        if (!res.ok) throw new Error('CRM request failed');
-      }),
-    ]);
-
-    if (emailResult.status === 'rejected') console.error('Email to support failed', emailResult.reason);
-    if (dbResult.status === 'rejected') console.error('Lead save failed', dbResult.reason);
-    if (crmResult.status === 'rejected') console.error('CRM subscribe failed', crmResult.reason);
-
-    if (emailResult.status === 'fulfilled' || dbResult.status === 'fulfilled' || crmResult.status === 'fulfilled') {
+    try {
+      await sendEnquiryEmail(enquiry(form, sms));
       setStatus('success');
       setForm(EMPTY);
-    } else {
+    } catch (err) {
+      // Keep the form filled so the mailto fallback can carry the enquiry
+      console.error('Email to support failed', err);
       setStatus('error');
     }
   };
@@ -133,10 +126,10 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
         <div>
           <SectionHeading center={false} eyebrow="Contact" title={<>Let's get you <span className="text-cc-yellow">covered.</span></>} sub="Tell us about your operation and we'll set you up with the right plan, or book a quick demo with our team." />
           <Reveal delay={150} className="mt-10 space-y-4">
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="cc-glass cc-travel flex items-center gap-4 rounded-2xl p-5 transition-transform hover:-translate-y-1">
+            <button type="button" onClick={requestDemo} className="cc-glass cc-travel flex w-full items-center gap-4 rounded-2xl p-5 text-left transition-transform hover:-translate-y-1">
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-cc-yellow text-black"><CalendarDays className="h-6 w-6" /></span>
               <span><span className="block font-bold">Book a Demo</span><span className="text-sm text-white/55">30 minute walkthrough with our team</span></span>
-            </a>
+            </button>
             <a href={`mailto:${SUPPORT_EMAIL}`} className="cc-glass cc-travel flex items-center gap-4 rounded-2xl p-5 transition-transform hover:-translate-y-1">
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/10 text-cc-yellow"><Mail className="h-6 w-6" /></span>
               <span><span className="block font-bold">{SUPPORT_EMAIL}</span><span className="text-sm text-white/55">We reply within one business day</span></span>
@@ -213,7 +206,15 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
               )}
             </div>
             {status === 'success' && <p className="mt-4 text-center text-sm font-semibold text-cc-yellow sm:text-right">Thanks mate! We'll be in touch shortly.</p>}
-            {status === 'error' && <p className="mt-4 text-center text-sm text-red-400 sm:text-right">Something went wrong. Please try again or email {SUPPORT_EMAIL}.</p>}
+            {status === 'error' && (
+              <div role="alert" className="mt-4 text-center text-sm sm:text-right">
+                <p className="text-red-400">We couldn't send your message automatically.</p>
+                <a href={mailtoHref(form, sms)} className="mt-2 inline-flex items-center gap-2 py-2 font-bold text-cc-yellow hover:underline">
+                  <Mail className="h-4 w-4" /> Email it to {SUPPORT_EMAIL} instead
+                </a>
+                <p className="text-xs text-white/45">Opens your email app with your details already filled in.</p>
+              </div>
+            )}
           </form>
         </Reveal>
       </div>

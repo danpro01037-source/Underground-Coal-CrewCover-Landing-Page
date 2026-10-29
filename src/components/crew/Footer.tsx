@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { X, Mail } from 'lucide-react';
 import Logo from './Logo';
-import { NAV_LINKS, SUPPORT_EMAIL, APP_STORE_URL, PLAY_STORE_URL, BOOKING_URL } from '@/data/crewcover';
+import { NAV_LINKS, SUPPORT_EMAIL, APP_STORE_URL, PLAY_STORE_URL } from '@/data/crewcover';
+import { requestDemo } from './demo';
 import { scrollToId } from './Navbar';
 
 const LEGAL = {
@@ -56,7 +57,7 @@ export default function Footer() {
           <ul className="mt-2 text-sm sm:mt-4 sm:space-y-2.5">
             <li><a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">App Store</a></li>
             <li><a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Google Play</a></li>
-            <li><a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Book a Demo</a></li>
+            <li><button onClick={requestDemo} className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Book a Demo</button></li>
           </ul>
         </div>
         <div>
