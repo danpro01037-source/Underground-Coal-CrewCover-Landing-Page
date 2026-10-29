@@ -18,36 +18,36 @@ function ReportsCard() {
   const rate = useCountUp(88, visible);
   const max = Math.max(...REPORT_BARS.map((b) => b.value));
   return (
-    <div ref={ref} className={`flex h-full flex-col p-7 sm:p-9 ${visible ? 'is-visible' : ''}`}>
+    <div ref={ref} className={`flex h-full flex-col p-5 sm:p-9 ${visible ? 'is-visible' : ''}`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <IconBadge Icon={BarChart3} />
           <h3 className="font-display mt-5 text-3xl sm:text-4xl">Management <span className="text-cc-yellow">reports</span></h3>
           <p className="mt-2 max-w-md text-white/60">Shifts filled, fill rate by role and cancellations. Workforce insights to plan ahead and keep your operation moving.</p>
         </div>
-        <span className="hidden rounded-full border border-white/10 px-3 py-1 text-xs text-white/60 sm:block">Last 30 days</span>
+        <span className="hidden shrink-0 whitespace-nowrap rounded-full border border-white/10 px-3 py-1 text-xs text-white/60 sm:block">Last 30 days</span>
       </div>
 
-      <div className="mt-7 grid grid-cols-3 gap-3">
-        <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <div className="font-display text-3xl sm:text-4xl">{Math.round(filled)}</div>
-          <div className="text-xs text-white/50">Shifts filled</div>
+      <div className="mt-7 grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="min-w-0 rounded-2xl border border-white/10 bg-black/40 p-3 sm:p-4">
+          <div className="font-display text-2xl sm:text-4xl">{Math.round(filled)}</div>
+          <div className="hyphens-auto text-[11px] leading-tight text-white/50 sm:text-xs">Shifts filled</div>
         </div>
-        <div className="rounded-2xl border border-cc-yellow/30 bg-cc-yellow/5 p-4">
-          <div className="font-display text-3xl text-cc-yellow sm:text-4xl">{Math.round(rate)}%</div>
-          <div className="text-xs text-white/50">Fill rate</div>
+        <div className="min-w-0 rounded-2xl border border-cc-yellow/30 bg-cc-yellow/5 p-3 sm:p-4">
+          <div className="font-display text-2xl text-cc-yellow sm:text-4xl">{Math.round(rate)}%</div>
+          <div className="hyphens-auto text-[11px] leading-tight text-white/50 sm:text-xs">Fill rate</div>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <div className="font-display text-3xl sm:text-4xl">{Math.round((rate / 88) * 6)}</div>
-          <div className="text-xs text-white/50">Cancellations</div>
+        <div className="min-w-0 rounded-2xl border border-white/10 bg-black/40 p-3 sm:p-4">
+          <div className="font-display text-2xl sm:text-4xl">{Math.round((rate / 88) * 6)}</div>
+          <div className="hyphens-auto text-[11px] leading-tight text-white/50 sm:text-xs">Cancellations</div>
         </div>
       </div>
 
-      <div className="mt-6 flex-1 rounded-2xl border border-white/10 bg-black/40 p-5">
+      <div className="mt-6 flex-1 rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-5">
         <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/50">Shifts filled by role</div>
         <div className="flex h-44 items-end gap-2 sm:gap-4">
           {REPORT_BARS.map((b, i) => (
-            <div key={b.role} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
+            <div key={b.role} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
               <span className={`text-xs font-bold text-cc-yellow transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDelay: `${900 + i * 120}ms` }}>{b.value}</span>
               <div
                 className="cc-bar w-full rounded-t-lg bg-gradient-to-t from-cc-amber to-cc-yellow shadow-[0_0_20px_rgba(255,214,0,.35)]"
@@ -69,7 +69,7 @@ export default function Features() {
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         <SectionHeading eyebrow="Features" title={<>Built for the <span className="text-cc-yellow">pit.</span> Not the office.</>} sub="Everything supervisors and crews need to keep shifts covered, all in one rugged, simple app." />
 
-        <div className="mt-16 grid auto-rows-[minmax(220px,auto)] gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-16 grid auto-rows-[minmax(220px,auto)] grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
           <TiltCard className="md:col-span-2 lg:row-span-2" max={5}>
             <ReportsCard />
           </TiltCard>

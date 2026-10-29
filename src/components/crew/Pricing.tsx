@@ -85,11 +85,11 @@ export default function Pricing({ onSelectPlan }: { onSelectPlan: (p: Plan) => v
           <span className={`text-sm font-semibold ${!annual ? 'text-white' : 'text-white/50'}`}>Monthly</span>
           <button
             onClick={() => setAnnual((a) => !a)}
-            className={`relative h-9 w-16 rounded-full border transition-colors ${annual ? 'border-cc-yellow bg-cc-yellow/20' : 'border-white/20 bg-white/5'}`}
+            className={`relative h-11 w-[4.75rem] rounded-full border transition-colors ${annual ? 'border-cc-yellow bg-cc-yellow/20' : 'border-white/20 bg-white/5'}`}
             aria-label="Toggle annual billing"
             aria-pressed={annual}
           >
-            <span className={`absolute top-1 h-7 w-7 rounded-full bg-cc-yellow shadow-[0_0_16px_#FFD600] transition-all duration-500 ease-[cubic-bezier(.3,1.5,.5,1)] ${annual ? 'left-8' : 'left-1'}`} />
+            <span className={`absolute top-1 h-[2.125rem] w-[2.125rem] rounded-full bg-cc-yellow shadow-[0_0_16px_#FFD600] transition-all duration-500 ease-[cubic-bezier(.3,1.5,.5,1)] ${annual ? 'left-9' : 'left-1'}`} />
           </button>
           <span className={`text-sm font-semibold ${annual ? 'text-white' : 'text-white/50'}`}>Annual</span>
           <span className="rounded-full bg-cc-yellow px-3 py-1 text-xs font-extrabold text-black">Save 2 months</span>

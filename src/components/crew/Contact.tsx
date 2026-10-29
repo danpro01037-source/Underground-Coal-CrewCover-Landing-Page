@@ -168,7 +168,7 @@ export default function Contact({ prefill, plan }: { prefill?: string; plan?: st
                 {errors.message && <p className="mt-1.5 text-xs text-red-400">{errors.message}</p>}
               </div>
               <label className="flex cursor-pointer items-start gap-3 text-sm text-white/60 sm:col-span-2">
-                <input type="checkbox" checked={sms} onChange={(e) => setSms(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#FFD600]" />
+                <input type="checkbox" checked={sms} onChange={(e) => setSms(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#FFD600]" />
                 <span>Text me updates. Msg &amp; data rates may apply. Reply STOP to unsubscribe.</span>
               </label>
             </div>

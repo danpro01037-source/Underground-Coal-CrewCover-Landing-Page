@@ -39,32 +39,32 @@ export default function Footer() {
         <div>
           <Logo size="md" tagline onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
           <p className="mt-5 max-w-sm text-sm text-white/55">The fastest way for Australian underground coal mines to fill vacant shifts. Post, alert, covered.</p>
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-cc-yellow hover:underline">
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-3 inline-flex items-center gap-2 py-2 text-sm font-semibold text-cc-yellow hover:underline">
             <Mail className="h-4 w-4" /> {SUPPORT_EMAIL}
           </a>
         </div>
         <div>
           <h4 className="font-display text-lg text-white">Explore</h4>
-          <ul className="mt-4 space-y-2.5 text-sm">
+          <ul className="mt-2 text-sm sm:mt-4 sm:space-y-2.5">
             {NAV_LINKS.map((l) => (
-              <li key={l.id}><button onClick={() => scrollToId(l.id)} className="cc-link text-white/55 hover:text-white">{l.label}</button></li>
+              <li key={l.id}><button onClick={() => scrollToId(l.id)} className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">{l.label}</button></li>
             ))}
           </ul>
         </div>
         <div>
           <h4 className="font-display text-lg text-white">Get the app</h4>
-          <ul className="mt-4 space-y-2.5 text-sm">
-            <li><a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="cc-link text-white/55 hover:text-white">App Store</a></li>
-            <li><a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className="cc-link text-white/55 hover:text-white">Google Play</a></li>
-            <li><a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="cc-link text-white/55 hover:text-white">Book a Demo</a></li>
+          <ul className="mt-2 text-sm sm:mt-4 sm:space-y-2.5">
+            <li><a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">App Store</a></li>
+            <li><a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Google Play</a></li>
+            <li><a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Book a Demo</a></li>
           </ul>
         </div>
         <div>
           <h4 className="font-display text-lg text-white">Legal</h4>
-          <ul className="mt-4 space-y-2.5 text-sm">
-            <li><button onClick={() => setLegal('privacy')} className="cc-link text-white/55 hover:text-white">Privacy Policy</button></li>
-            <li><button onClick={() => setLegal('terms')} className="cc-link text-white/55 hover:text-white">Terms of Use</button></li>
-            <li><a href="/admin/leads" className="cc-link text-white/40 hover:text-cc-yellow">Leads Admin</a></li>
+          <ul className="mt-2 text-sm sm:mt-4 sm:space-y-2.5">
+            <li><button onClick={() => setLegal('privacy')} className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Privacy Policy</button></li>
+            <li><button onClick={() => setLegal('terms')} className="cc-link inline-block py-2 text-white/55 hover:text-white sm:py-0">Terms of Use</button></li>
+            <li><a href="/admin/leads" className="cc-link inline-block py-2 text-white/40 hover:text-cc-yellow sm:py-0">Leads Admin</a></li>
           </ul>
         </div>
       </div>

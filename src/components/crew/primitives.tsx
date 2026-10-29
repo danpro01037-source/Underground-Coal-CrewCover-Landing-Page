@@ -23,8 +23,11 @@ export function Reveal({ children, className = '', delay = 0, variant = 'up', as
 export function LightDivider() {
   const [ref, visible] = useInView<HTMLDivElement>(0.5);
   return (
-    <div ref={ref} aria-hidden className={`cc-divider ${visible ? 'is-visible' : ''} -rotate-2 scale-x-110`}>
-      <span />
+    // clip horizontally only, so the scaled line and sweeping glint can't widen the page
+    <div className="overflow-x-clip">
+      <div ref={ref} aria-hidden className={`cc-divider ${visible ? 'is-visible' : ''} -rotate-2 scale-x-110`}>
+        <span />
+      </div>
     </div>
   );
 }
